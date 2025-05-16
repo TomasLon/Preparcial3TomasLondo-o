@@ -1,6 +1,5 @@
 package org.edu.uniquindio;
 
-import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,37 +8,40 @@ public class Peaje {
     private String ubicacion;
     private String nombre;
     private double dineroRecaudado;
-    private LinkedList<Vehiculo> vehiculosAtendidos;
-    private LinkedList<Vehiculo> listaVehiculos;
+    private LinkedList<Vehiculo> vehiculosRegistrados;  // Vehículos registrados
+    private LinkedList<Vehiculo> pasosRegistrados;     // Cada paso por peaje (puede repetirse un vehículo)
 
-    public Peaje(String ubicacion, String nombre, LinkedList<Vehiculo> vehiculosAtendidos) {
+    public Peaje(String ubicacion, String nombre) {
         this.ubicacion = ubicacion;
         this.nombre = nombre;
-        this.vehiculosAtendidos = new LinkedList<>();
+        this.vehiculosRegistrados = new LinkedList<>();
+        this.pasosRegistrados = new LinkedList<>();
     }
 
-    public String getUbicacion() {return ubicacion;}
+    public void registrarPasoPorPeaje(Vehiculo vehiculo) {
+        pasosRegistrados.add(vehiculo);
+        dineroRecaudado += calcularValorPeaje(vehiculo);
+        if (!vehiculosRegistrados.contains(vehiculo)) {
+            vehiculosRegistrados.add(vehiculo);
+        }
+    }
 
-    public void setUbicacion(String ubicacion) {this.ubicacion = ubicacion;}
-
-    public String getNombre() {return nombre;}
-
-    public void setNombre(String nombre) {this.nombre = nombre;}
-
-
-    public void clasificarVehiculos( List<Vehiculo> vehiculos,
-                                     LinkedList<Camion> camiones, LinkedList<Carro> carros,
-                                     LinkedList<Moto> motos) {
-
-        for (Vehiculo vehiculo : vehiculos) {
-            if (vehiculo instanceof Camion) {
-                camiones.add((Camion) vehiculo);
-            } else if (vehiculo instanceof Carro) {
-                carros.add((Carro) vehiculo);
-            } else if (vehiculo instanceof Moto) {
-                motos.add((Moto) vehiculo);
+    // Buscar vehículo por placa
+    public Vehiculo buscarVehiculoPorPlaca(String placa) {
+        for (Vehiculo v : vehiculosRegistrados) {
+            if (v.getPlaca().equalsIgnoreCase(placa)) {
+                return v;
             }
         }
+        return null;
+    }
+
+    public int cantidadVehiculosAtendidos() {
+        return vehiculosRegistrados.size();
+    }
+
+    public double obtenerTotalRecaudado() {
+        return dineroRecaudado;
     }
 
     public double calcularValorPeaje(Vehiculo vehiculo) {
@@ -50,7 +52,7 @@ public class Peaje {
             peaje = 7000 * camion.getCantidadEjes();
 
             if (camion.getCapacidadCargaTon() > 10) {
-                peaje += peaje * 0.10; // recargo del 10% si supera 10 toneladas
+                peaje += peaje * 0.10; // recargo 10%
             }
 
         } else if (vehiculo instanceof Carro) {
@@ -58,11 +60,11 @@ public class Peaje {
             peaje = 10000;
 
             if (carro.isMotorElectrico()) {
-                peaje -= peaje * 0.20; // descuento del 20%
+                peaje -= peaje * 0.20; // descuento 20%
             }
 
             if (carro.isVehiculoPublico()) {
-                peaje += peaje * 0.15; // incremento del 15%
+                peaje += peaje * 0.15; // incremento 15%
             }
 
         } else if (vehiculo instanceof Moto) {
@@ -70,22 +72,14 @@ public class Peaje {
             peaje = 5000;
 
             if (moto.getCilindraje() > 200) {
-                peaje += 2000; // recargo por cilindraje alto
+                peaje += 2000;
             }
         }
         return peaje;
     }
 
-    public double calcularTotalRecaudado(List<Vehiculo> vehiculos) {
-        double total = 0;
-
-        for (Vehiculo v : vehiculos) {
-            total += calcularValorPeaje(v);
-        }
-        return total;
+    public double getDineroRecaudado() {
+        return dineroRecaudado;
     }
-
-
-
 
 }

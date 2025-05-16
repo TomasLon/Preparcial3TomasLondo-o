@@ -40,7 +40,8 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
         return centinela;
     }
 
-// ------------------ OVERRIDE METHODS -----------------
+// ========================= OVERRIDE METHODS =============================
+
 
 
     // ================= CAMION =================
@@ -182,7 +183,7 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
                 .collect(Collectors.toList());
     }
 
-// ============ CONDUCTOR ============
+    // ============ CONDUCTOR ============
 
     @Override
     public boolean crearConductor(Conductor conductor) {
