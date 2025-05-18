@@ -1,12 +1,17 @@
 package org.edu.uniquindio;
 
+
 abstract class Vehiculo {
+
+    private Conductor conductorAsignado;
+
     protected String placa;
     protected String modelo;
 
     public Vehiculo(String placa, String modelo) {
         this.placa = placa;
         this.modelo = modelo;
+        this.conductorAsignado = conductorAsignado;
     }
 
     public String getPlaca() {
@@ -24,5 +29,10 @@ abstract class Vehiculo {
     public void setModelo(String modelo) {
         this.modelo = modelo;
     }
-
+    public Conductor getConductorAsignado() {
+        return conductorAsignado;
+    }
+    public void setConductorAsignado(Conductor conductorAsignado) {
+        this.conductorAsignado = conductorAsignado;
+    }
 }
