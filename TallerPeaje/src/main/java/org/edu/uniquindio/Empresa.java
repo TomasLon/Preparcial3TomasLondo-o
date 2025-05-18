@@ -3,6 +3,7 @@ package org.edu.uniquindio;
 import org.edu.uniquindio.interfaces.*;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecaudador, ICRUDConductor {
@@ -285,5 +286,39 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
         if (!vehiculosAtendidosSet.contains(vehiculo)) {
             vehiculosAtendidosSet.add(vehiculo);
         }
+    }
+
+    public Recaudador buscarRecaudadorPorNombreCompleto(String nombreCompleto) {
+        if (nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
+            return null;
+        }
+
+        // Normalizar la entrada: eliminar espacios extra y convertir a minúsculas
+        String nombreNormalizado = nombreCompleto.trim().toLowerCase().replaceAll("\\s+", " ");
+
+        return personas.stream()
+                .filter(p -> p instanceof Recaudador)
+                .map(p -> (Recaudador) p)
+                .filter(r -> {
+                    // Normalizar el nombre completo del recaudador
+                    String nombreRecaudador = (r.getNombre() + " " + r.getApellido()).trim().toLowerCase().replaceAll("\\s+", " ");
+                    return nombreRecaudador.equals(nombreNormalizado);
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
+    public List<Conductor> obtenerConductoresConCamionesPesados() {
+        return personas.stream()
+                .filter(p -> p instanceof Conductor)
+                .map(p -> (Conductor) p)
+                .filter(conductor ->
+                        conductor.getVehiculosAsignados().stream()
+                                .anyMatch(vehiculo ->
+                                        vehiculo instanceof Camion &&
+                                                ((Camion) vehiculo).getCapacidadCargaTon() > 10
+                                )
+                )
+                .collect(Collectors.toList());
     }
 }

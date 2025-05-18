@@ -20,7 +20,6 @@ public class DatosQuemados {
         // Datos quemados personas
         conductores.add(new Conductor("Juan", "Perez", LocalDate.of(1980, 5, 15), "123456789", "EMP001"));
         conductores.add(new Conductor("Ana", "Martinez", LocalDate.of(1985, 3, 20), "987654321", "EMP002"));
-
         recaudadores.add(new Recaudador("Maria", "Lopez", LocalDate.of(1990, 7, 10), "1122334455", "EMP003"));
         recaudadores.add(new Recaudador("Carlos", "Gomez", LocalDate.of(1982, 12, 5), "5566778899", "EMP004"));
 
