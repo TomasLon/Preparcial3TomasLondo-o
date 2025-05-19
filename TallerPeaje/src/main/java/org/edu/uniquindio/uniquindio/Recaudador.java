@@ -1,4 +1,4 @@
-package org.edu.uniquindio;
+package org.edu.uniquindio.uniquindio;
 
 import java.time.LocalDate;
 

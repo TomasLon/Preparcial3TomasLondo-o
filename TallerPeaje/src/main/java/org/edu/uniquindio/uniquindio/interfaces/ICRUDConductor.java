@@ -1,4 +1,4 @@
-package org.edu.uniquindio.interfaces;
+package org.edu.uniquindio.uniquindio.interfaces;
 
 import org.edu.uniquindio.Conductor;
 

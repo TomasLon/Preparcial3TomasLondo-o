@@ -1,4 +1,7 @@
-package org.edu.uniquindio;
+package org.edu.uniquindio.uniquindio;
+
+import org.edu.uniquindio.Camion;
+import org.edu.uniquindio.Vehiculo;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -27,11 +30,11 @@ public class DatosQuemados {
         carros.add(new Carro("ABC123", "Toyota", true, false, 10));
         carros.add(new Carro("XYZ789", "Honda", true, true, 10));
 
-        motos.add(new Moto("MOTO001", "Yamaha YZF-R3", 800));
-        motos.add(new Moto("MOTO002", "Kawasaki Ninja 400", 400));
+        motos.add(new Moto("MOTO001", "Yamaha YZF-R3", 800, 10));
+        motos.add(new Moto("MOTO002", "Kawasaki Ninja 400", 400, 8));
 
-        camiones.add(new Camion("CAMION01", "Volvo FH16", 6, 9));
-        camiones.add(new Camion("CAMION02", "Scania R500", 10, 15));
+        camiones.add(new Camion("CAMION01", "Volvo FH16", 6, 9, 3));
+        camiones.add(new Camion("CAMION02", "Scania R500", 10, 15, 9));
     }
 
     // Métodos para obtener listas de personas

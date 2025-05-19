@@ -1,4 +1,4 @@
-package org.edu.uniquindio;
+package org.edu.uniquindio.uniquindio;
 
 import javax.swing.*;
 import java.util.List;
@@ -8,9 +8,8 @@ public class Main {
     static Peaje peaje = new Peaje("Armenia", "Peaje Principal");
     static List<Vehiculo> vehiculos = DatosQuemados.getTodosLosVehiculos();
     static List<Persona> personas = DatosQuemados.getTodasLasPersonas();
-    static CrudPersonaUI crudPersonaUI = new CrudPersonaUI(empresa);
 
-    // Inicializamos la empresa con los vehículos y personas
+
     static {
         for (Vehiculo v : vehiculos) {
             if (v instanceof Camion) {
@@ -63,10 +62,12 @@ public class Main {
     private static void manejarMenuPrincipal(String opcion) {
         switch (opcion) {
             case "Administrar Vehículos":
-                CrudVehiculoUI.mostrarMenu(vehiculos);
+                MenuCRUDPersona menuVehiculo = new MenuCRUDPersona();
+                menuPerso.mostrarMenu(personas);
                 break;
             case "Administrar Personas":
-                crudPersonaUI.mostrarMenu();
+                MenuCRUDVehiculo menuVehiculo = new MenuCRUDVehiculo();
+                menuVehiculo.mostrarMenu(vehiculos);
                 break;
             case "Registrar paso de vehículo":
                 registrarPaso();
@@ -97,8 +98,8 @@ public class Main {
         Vehiculo vehiculo = empresa.buscarVehiculoPorPlaca(placa);
         if (vehiculo != null) {
             double valorPeaje = empresa.calcularValorPeaje(vehiculo);
-            peaje.registrarPasoPorPeaje(vehiculo, valorPeaje);
-            empresa.registrarVehiculoAtendido(); // Un método nuevo que incrementa el contador
+            empresa.registrarPasoVehiculo(vehiculo);
+            empresa.registrarVehiculoAtendido();
             JOptionPane.showMessageDialog(null,
                     "Paso registrado para vehículo:\n" +
                             vehiculo.getPlaca() + " - " + vehiculo.getModelo() +
@@ -136,4 +137,21 @@ public class Main {
     private static void mostrarDineroRecaudado() {
         JOptionPane.showMessageDialog(null, String.format("Dinero recaudado: $%.2f", peaje.getDineroRecaudado()));
     }
+
+    public static void procesarPasoVehiculo(String placa) {
+        Vehiculo vehiculo = empresa.buscarVehiculoPorPlaca(placa);
+        if (vehiculo == null) {
+            JOptionPane.showMessageDialog(null, "Vehículo no encontrado.");
+            return;
+        }
+
+        double valorPeaje = empresa.calcularValorPeaje(vehiculo);
+        empresa.registrarPasoVehiculo(vehiculo);
+
+        JOptionPane.showMessageDialog(null,
+                "Paso registrado exitosamente.\n" +
+                        "Vehículo: " + vehiculo.getPlaca() + "\n" +
+                        "Valor peaje: $" + String.format("%.2f", valorPeaje));
+    }
+
 }

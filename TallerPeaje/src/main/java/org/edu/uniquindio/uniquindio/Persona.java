@@ -1,8 +1,9 @@
-package org.edu.uniquindio;
+package org.edu.uniquindio.uniquindio;
 
 import java.time.LocalDate;
 
 abstract class Persona {
+
     protected String nombre;
     protected String apellido;
     protected LocalDate fechaNacimiento;

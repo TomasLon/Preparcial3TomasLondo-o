@@ -1,9 +1,13 @@
-package org.edu.uniquindio;
+package org.edu.uniquindio.uniquindio;
+
+import org.edu.uniquindio.Camion;
+import org.edu.uniquindio.Moto;
+import org.edu.uniquindio.Vehiculo;
 
 import javax.swing.*;
 import java.util.List;
 
-public class CrudVehiculoUI {
+public class MenuCRUDVehiculo {
 
     public static void mostrarMenu(List<Vehiculo> vehiculos) {
         while (true) {
@@ -29,7 +33,6 @@ public class CrudVehiculoUI {
     }
 
     private static void crearVehiculo(List<Vehiculo> vehiculos) {
-
         String placa = JOptionPane.showInputDialog("Ingrese placa:");
         String modelo = JOptionPane.showInputDialog("Ingrese modelo:");
         String tipo = (String) JOptionPane.showInputDialog(null, "Tipo de vehículo:", "Tipo",
@@ -45,12 +48,12 @@ public class CrudVehiculoUI {
                 }
                 case "Moto" -> {
                     double cilindraje = Double.parseDouble(JOptionPane.showInputDialog("Cilindraje:"));
-                    nuevo = new Moto(placa, modelo, cilindraje);
+                    nuevo = new Moto(placa, modelo, cilindraje, 0);
                 }
                 case "Camion" -> {
                     int ejes = Integer.parseInt(JOptionPane.showInputDialog("Cantidad de ejes:"));
                     double carga = Double.parseDouble(JOptionPane.showInputDialog("Capacidad de carga (ton):"));
-                    nuevo = new Camion(placa, modelo, ejes, carga);
+                    nuevo = new Camion(placa, modelo, ejes, carga, 0);
                 }
             }
             if (nuevo != null) {
@@ -61,12 +64,9 @@ public class CrudVehiculoUI {
     }
 
     private static void listarVehiculos(List<Vehiculo> vehiculos) {
-        StringBuilder sb = new StringBuilder("Vehículos registrados:\n");
+        StringBuilder sb = new StringBuilder("Vehículos registrados:\n\n");
         for (Vehiculo v : vehiculos) {
-            sb.append(v.getClass().getSimpleName())
-                    .append(" - Placa: ").append(v.getPlaca())
-                    .append(", Modelo: ").append(v.getModelo())
-                    .append("\n");
+            sb.append(v.toString()).append("\n\n");
         }
         JOptionPane.showMessageDialog(null, sb.toString());
     }
@@ -95,6 +95,4 @@ public class CrudVehiculoUI {
         vehiculos.remove(v);
         JOptionPane.showMessageDialog(null, "Vehículo eliminado.");
     }
-
-
 }

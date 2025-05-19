@@ -1,6 +1,8 @@
-package org.edu.uniquindio;
+package org.edu.uniquindio.uniquindio;
 
 import org.edu.uniquindio.interfaces.*;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +14,10 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
     private String nit;
     private LinkedList<Vehiculo> vehiculos;
     private LinkedList<Persona> personas;
+    private int vehiculosAtendidos = 0;
+    private LinkedList<Vehiculo> vehiculosAtendidosSet = new LinkedList<>();
+    private List<Vehiculo> pasosRegistrados = new ArrayList<>();
+
 
     public Empresa(String nombre, String nit) {
         this.nombre = nombre;
@@ -19,6 +25,13 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
         this.vehiculos = new LinkedList<>();
         this.personas = new LinkedList<>();
     }
+
+    public void registrarPasoVehiculo(Vehiculo vehiculo) {
+        pasosRegistrados.add(vehiculo);
+    }
+
+
+    // Verificaciones de existencia de las instancias Vehículo y Persona
 
     public boolean verificarVehiculo(String placa) {
         return vehiculos.stream().anyMatch(v -> v.getPlaca().equalsIgnoreCase(placa));
@@ -28,6 +41,7 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
         return personas.stream().anyMatch(p -> p.getIdentificacion().equalsIgnoreCase(identificacion));
     }
 
+
     public Vehiculo buscarVehiculoPorPlaca(String placa) {
         return vehiculos.stream()
                 .filter(v -> v.getPlaca().equalsIgnoreCase(placa))
@@ -35,34 +49,12 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
                 .orElse(null);
     }
 
-    public double calcularValorPeaje(Vehiculo vehiculo) {
-        double peaje = 0;
-
-        if (vehiculo instanceof Camion) {
-            Camion camion = (Camion) vehiculo;
-            peaje = 7000 * camion.getCantidadEjes();
-            if (camion.getCapacidadCargaTon() > 10) {
-                peaje += peaje * 0.10; // recargo 10%
-            }
-
-        } else if (vehiculo instanceof Carro) {
-            Carro carro = (Carro) vehiculo;
-            peaje = 10000;
-            if (carro.isMotorElectrico()) {
-                peaje -= peaje * 0.20; // descuento 20%
-            }
-            if (carro.isVehiculoPublico()) {
-                peaje += peaje * 0.15; // incremento 15%
-            }
-
-        } else if (vehiculo instanceof Moto) {
-            Moto moto = (Moto) vehiculo;
-            peaje = 5000;
-            if (moto.getCilindraje() > 200) {
-                peaje += 2000;
-            }
-        }
-        return peaje;
+    public Conductor buscarConductorPorId(String identificacion) {
+        return personas.stream()
+                .filter(p -> p instanceof Conductor && p.getIdentificacion().equalsIgnoreCase(identificacion))
+                .map(p -> (Conductor) p)
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -246,33 +238,20 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
                 .collect(Collectors.toList());
     }
 
+
+
     // ============ MÉTODOS ADICIONALES ============
 
-    public Conductor buscarConductorPorId(String identificacion) {
-        return personas.stream()
-                .filter(p -> p instanceof Conductor && p.getIdentificacion().equalsIgnoreCase(identificacion))
-                .map(p -> (Conductor) p)
-                .findFirst()
-                .orElse(null);
-    }
 
     public boolean asignarVehiculoAConductor(String idConductor, String placa) {
         Conductor conductor = buscarConductorPorId(idConductor);
-        if (conductor == null) {
-            return false; // Aquí podrías lanzar una excepción personalizada
+        Vehiculo vehiculo = buscarVehiculoPorPlaca(placa);
+
+        if (conductor != null && vehiculo != null) {
+            return conductor.getVehiculosAsignados().add(vehiculo);
         }
-        for (Vehiculo vehiculo : vehiculos) {
-            if (vehiculo.getPlaca().equalsIgnoreCase(placa) && !conductor.getVehiculosAsignados().contains(vehiculo)) {
-                conductor.getVehiculosAsignados().add(vehiculo);
-                return true;
-            }
-        }
-        return false; // Vehículo no encontrado
+        return false;
     }
-
-
-    private int vehiculosAtendidos = 0;
-    private LinkedList<Vehiculo> vehiculosAtendidosSet = new LinkedList<>();
 
     public int cantidadVehiculosAtendidos() {
         return vehiculosAtendidosSet.size();
@@ -288,19 +267,112 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
         }
     }
 
-    public Recaudador buscarRecaudadorPorNombreCompleto(String nombreCompleto) {
-        if (nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
-            return null;
+    public Recaudador buscarRecaudadorPorId(String id) {
+        for (Recaudador r : recaudadores) {
+            if (r.getIdentificacion().equals(id)) {
+                return r;
+            }
+        }
+        return null;
+    }
+
+    public Collection<Vehiculo> getListaVehiculos() {
+        return vehiculos;
+    }
+
+
+    // Métodos de peaje
+
+    public double calcularValorPeaje(Vehiculo vehiculo) {
+        double peaje = 0;
+
+        if (vehiculo instanceof Camion) {
+            Camion camion = (Camion) vehiculo;
+            peaje = 7000 * camion.getCantidadEjes();
+            if (camion.getCapacidadCargaTon() > 10) {
+                peaje += peaje * 0.10; // recargo 10%
+            }
+
+        } else if (vehiculo instanceof Carro) {
+            Carro carro = (Carro) vehiculo;
+            peaje = 10000;
+            if (carro.isMotorElectrico()) {
+                peaje -= peaje * 0.20; // descuento 20%
+            }
+            if (carro.isVehiculoPublico()) {
+                peaje += peaje * 0.15; // incremento 15%
+            }
+
+        } else if (vehiculo instanceof Moto) {
+            Moto moto = (Moto) vehiculo;
+            peaje = 5000;
+            if (moto.getCilindraje() > 200) {
+                peaje += 2000;
+            }
+        }
+        return peaje;
+    }
+
+                // ======== Tíquet del peaje =========
+
+    public String generarInformeDetallado() {
+        StringBuilder informe = new StringBuilder("=== INFORME DE VEHÍCULOS Y PEAJES ===\n\n");
+        double totalRecaudado = 0;
+
+        for (Vehiculo v : pasosRegistrados) {
+            double valorPeaje = calcularValorPeaje(v);
+            totalRecaudado += valorPeaje;
+
+            informe.append("Vehículo: ").append(v.toString())
+                    .append("\nValor peaje: $").append(String.format("%.0f", valorPeaje))
+                    .append("\nDetalle cálculo: ");
+
+            if (v instanceof Camion camion) {
+                double base = 7000 * camion.getCantidadEjes();
+                informe.append("Base ($7,000 x ").append(camion.getCantidadEjes()).append(" ejes): $").append(String.format("%.2f", base));
+
+                if (camion.getCapacidadCargaTon() > 10) {
+                    double recargo = base * 0.10;
+                    informe.append(" + Recargo por alta capacidad (10%): $").append(String.format("%.2f", recargo));
+                }
+            } else if (v instanceof Carro carro) {
+                informe.append("Base: $10,000");
+
+                if (carro.isMotorElectrico()) {
+                    informe.append(" - Descuento por vehículo eléctrico (20%): $").append(String.format("%.2f", 10000 * 0.20));
+                }
+
+                if (carro.isVehiculoPublico()) {
+                    double base = carro.isMotorElectrico() ? 10000 * 0.8 : 10000;
+                    informe.append(" + Incremento por vehículo público (15%): $").append(String.format("%.2f", base * 0.15));
+                }
+            } else if (v instanceof Moto moto) {
+                informe.append("Base: $5,000");
+
+                if (moto.getCilindraje() > 200) {
+                    informe.append(" + Recargo por alto cilindraje: $2,000");
+                }
+            }
+
+            informe.append("\n\n");
         }
 
-        // Normalizar la entrada: eliminar espacios extra y convertir a minúsculas
+        informe.append("Total recaudado: $").append(String.format("%.2f", totalRecaudado));
+        return informe.toString();
+    }
+
+    // Métodos gestión Personas
+
+    public Recaudador buscarRecaudadorPorNombreCompleto(String nombreCompleto) {
+        if (nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
+            return null;}
+
         String nombreNormalizado = nombreCompleto.trim().toLowerCase().replaceAll("\\s+", " ");
 
         return personas.stream()
                 .filter(p -> p instanceof Recaudador)
                 .map(p -> (Recaudador) p)
                 .filter(r -> {
-                    // Normalizar el nombre completo del recaudador
                     String nombreRecaudador = (r.getNombre() + " " + r.getApellido()).trim().toLowerCase().replaceAll("\\s+", " ");
                     return nombreRecaudador.equals(nombreNormalizado);
                 })
@@ -321,4 +393,31 @@ public class Empresa implements ICRUDCamion, ICRUDCarro, ICRUDMoto, ICRUDRecauda
                 )
                 .collect(Collectors.toList());
     }
+
+
+    public String calcularTotalPeajesConductor(String idConductor) {
+        Conductor conductor = buscarConductorPorId(idConductor);
+        if (conductor == null) {
+            return "Conductor no encontrado";
+        }
+
+        StringBuilder informe = new StringBuilder();
+        informe.append("=== INFORME DE PEAJES PARA ").append(conductor.getNombre())
+                .append(" ").append(conductor.getApellido()).append(" ===\n\n");
+
+        double totalPagado = 0;
+
+        for (Vehiculo v : conductor.getVehiculosAsignados()) {
+            double valorPeaje = calcularValorPeaje(v);
+            totalPagado += valorPeaje;
+
+            informe.append("Vehículo: ").append(v.toString())
+                    .append("\nValor peaje: $").append(String.format("%.2f", valorPeaje))
+                    .append("\n\n");
+        }
+
+        informe.append("Total pagado en peajes: $").append(String.format("%.2f", totalPagado));
+        return informe.toString();
+    }
+
 }
